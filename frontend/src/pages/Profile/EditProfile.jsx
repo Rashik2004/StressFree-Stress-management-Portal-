@@ -34,10 +34,12 @@ const EditProfile = () => {
   };
 
   const handleSubmit = async () => {
-      // Logic to sync with backend
-       await updateProfile(formData);
-       // Show success feedback
-       // alert("Profile Updated!"); // Or better toast
+      try {
+        await updateProfile(formData);
+        alert("Profile Updated Successfully!");
+      } catch (error) {
+        alert("Failed to update profile. Please try again.");
+      }
   };
 
   return (
