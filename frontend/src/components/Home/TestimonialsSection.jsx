@@ -19,7 +19,7 @@ const TestimonialsSection = () => {
         setTestimonials(data);
         if (data.length > 0) setActiveId(data[0]._id);
       } catch (error) {
-        console.error('Error fetching testimonials:', error);
+        console.error('Error fetching testimonials:', error.response?.data || error.message);
       } finally {
         setLoading(false);
       }

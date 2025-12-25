@@ -20,7 +20,7 @@ const FeedbackSection = () => {
         setLoading(true);
 
         try {
-             await axios.post('/api/content/testimonials', {
+             await api.post('/content/testimonials', {
                  ...formData,
                  image: user?.profilePicture // send profile pic if available
              });
