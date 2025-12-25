@@ -74,7 +74,7 @@ const TestimonialsSection = () => {
           </div>
 
           {/* Right Side - Scrollable List */}
-          <div className="lg:w-[55%] flex flex-col gap-5 lg:pl-12 lg:h-[700px] lg:overflow-y-auto no-scrollbar scroll-smooth p-2">
+          <div className="lg:w-[55%] flex flex-col gap-5 lg:pl-12 lg:h-[700px] lg:overflow-y-auto no-scrollbar scroll-smooth p-2 lg:pt-20">
              {testimonials.map((t) => (
               <motion.div
                 key={t._id}
