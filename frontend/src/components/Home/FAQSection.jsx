@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus } from 'lucide-react';
 
+import api from '../../services/api';
+
 const FAQSection = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [faqs, setFaqs] = useState([]);
@@ -10,9 +12,8 @@ const FAQSection = () => {
   React.useEffect(() => {
     const fetchFAQs = async () => {
       try {
-        const res = await fetch('/api/content/faqs');
-        const data = await res.json();
-        setFaqs(data);
+        const res = await api.get('/content/faqs');
+        setFaqs(res.data);
       } catch (error) {
         console.error('Error fetching FAQs:', error);
       } finally {

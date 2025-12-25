@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Brain, Trophy, Library, Shield, Gauge, Smartphone, ChevronRight } from 'lucide-react';
-
+import api from '../../services/api';
 const iconMap = {
   Brain, Trophy, Library, Shield, Gauge, Smartphone
 };
+
+
 
 const FeaturesBenefits = () => {
   const [features, setFeatures] = useState([]);
@@ -13,9 +15,8 @@ const FeaturesBenefits = () => {
   React.useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        const res = await fetch('/api/content/features');
-        const data = await res.json();
-        setFeatures(data);
+        const res = await api.get('/content/features');
+        setFeatures(res.data);
       } catch (error) {
         console.error('Error fetching features:', error);
       } finally {

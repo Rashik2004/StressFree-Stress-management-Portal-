@@ -4,6 +4,8 @@ import { Star, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Loader from '../Common/Loader';
 
+import api from '../../services/api';
+
 const TestimonialsSection = () => {
   const [activeId, setActiveId] = useState(1);
   const [testimonials, setTestimonials] = useState([]);
@@ -12,8 +14,8 @@ const TestimonialsSection = () => {
   React.useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const res = await fetch('/api/content/testimonials');
-        const data = await res.json();
+        const res = await api.get('/content/testimonials');
+        const data = res.data;
         setTestimonials(data);
         if (data.length > 0) setActiveId(data[0]._id);
       } catch (error) {
@@ -23,6 +25,7 @@ const TestimonialsSection = () => {
       }
     };
     fetchTestimonials();
+
   }, []);
 
   if (loading) return <div className="py-24 text-center text-primary flex justify-center"><Loader className="w-16 h-16" /></div>;
