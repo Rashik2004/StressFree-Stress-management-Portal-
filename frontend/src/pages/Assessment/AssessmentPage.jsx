@@ -48,6 +48,8 @@ const AssessmentPage = () => {
     const [result, setResult] = useState(null);
 
     const handleAnswer = (val) => {
+        if (isAnalyzing) return; 
+
         const newAnswers = [...answers, val];
         setAnswers(newAnswers);
 
@@ -59,28 +61,31 @@ const AssessmentPage = () => {
     };
 
     const handleSubmit = async (finalAnswers) => {
+        if (isAnalyzing) return;
         setIsAnalyzing(true);
         // Fake delay for "AI" feel
         try {
             // Actual API Call
-            // Convert simple Yes/No to weighted values if needed, but backend handles sum
-            // Here we send raw 1 (Yes) or 0 (No) * weight?
-            // Let's just send weighted array for simplicity or raw
-            // For this implementation, let's send 1 for yes, 0 for no, let backend handle weights?
-            // Actually our backend sums values. So let's send weighted values.
+            const weightedAnswers = finalAnswers.map((ans, idx) => {
+                const question = questions[idx];
+                return question ? ans * question.weight : 0;
+            });
 
-            const weightedAnswers = finalAnswers.map((ans, idx) => ans * questions[idx].weight);
+            // Limit to question length just in case
+            const safeWeightedAnswers = weightedAnswers.slice(0, questions.length);
 
             // Wait 2 seconds for effect
             await new Promise(r => setTimeout(r, 2000));
 
-            const data = await aiService.submitAssessment(weightedAnswers, user.token);
+            const data = await aiService.submitAssessment(safeWeightedAnswers, user.token);
             setResult(data);
         } catch (error) {
             console.error("AI Analysis Failed", error);
-            alert("Analysis failed. Please try again.");
-        } finally {
-            setIsAnalyzing(false);
+            alert("Analysis failed: " + error.message);
+            setIsAnalyzing(false); // Only reset if failed, so user can try again (or maybe navigate away?)
+            // If we reset, we need to reset answers too?
+            // Better to let them retry the last step?
+            // For now, allow retry.
         }
     };
 
