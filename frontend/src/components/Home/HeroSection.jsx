@@ -4,7 +4,7 @@ import LandingImage from '../../assets/images/Mindfulness-bro.svg';
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-32 pb-20 overflow-hidden">
+    <section className="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden">
 
       {/* Background Text - Positioned absolutely but centered relative to container */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden">
@@ -13,7 +13,7 @@ const HeroSection = () => {
         </h1>
       </div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-6 relative z-10 translate-y-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
 
             {/* Left Content: Text & CTA */}
