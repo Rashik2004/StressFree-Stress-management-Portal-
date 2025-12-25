@@ -50,7 +50,21 @@ const FeaturesBenefits = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
+          {features.map((feature, index) => {
+            // Hotfix: Override colors for 3rd (index 2) and 5th (index 4) items specifically
+            let cardColor = feature.color;
+            let iconColor = feature.textColor;
+
+            if (index === 2) {
+                cardColor = 'bg-[#f8dcb1]'; // Soft Pastel Peach
+                iconColor = 'text-[#2e5c55]';
+            }
+            if (index === 4) {
+                 cardColor = 'bg-[#cbece6]'; // Soft Pastel Mint
+                 iconColor = 'text-[#2e5c55]';
+            }
+
+            return (
             <motion.div
               key={feature._id}
               initial={{ opacity: 0, y: 40 }}
@@ -61,7 +75,7 @@ const FeaturesBenefits = () => {
               className="flex flex-col group"
             >
               {/* Arch Shape Container */}
-              <div className={`h-64 ${feature.color} rounded-t-[10rem] rounded-b-3xl mb-6 flex items-center justify-center relative overflow-hidden group-hover:shadow-xl transition-all duration-300`}>
+              <div className={`h-64 ${cardColor} rounded-t-[10rem] rounded-b-3xl mb-6 flex items-center justify-center relative overflow-hidden group-hover:shadow-xl transition-all duration-300`}>
 
                 {/* Decorative Pattern overlay */}
                 <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/40 to-transparent" />
@@ -72,7 +86,7 @@ const FeaturesBenefits = () => {
                     return (
                         <IconComponent
                         size={64}
-                        className={`${feature.textColor} transform group-hover:scale-110 transition-transform duration-300`}
+                        className={`${iconColor} transform group-hover:scale-110 transition-transform duration-300`}
                         strokeWidth={1.5}
                         />
                     );
@@ -105,7 +119,8 @@ const FeaturesBenefits = () => {
                 )}
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
       </div>
