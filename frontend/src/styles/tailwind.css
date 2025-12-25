@@ -1,0 +1,27 @@
+@import "tailwindcss";
+@import "./variables.css";
+
+@theme {
+  --font-sans: "Quicksand", sans-serif;
+
+  /* Semantic Colors mapped to CSS variables */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+
+  /* Helper text colors */
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 bg-primary text-primary-foreground rounded hover:opacity-90 transition-opacity;
+  }
+
+  .card {
+      @apply bg-surface rounded-2xl shadow-sm border border-primary/10 transition-colors duration-500;
+  }
+}

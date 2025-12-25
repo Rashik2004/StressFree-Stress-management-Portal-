@@ -1,0 +1,75 @@
+/* --- Theme Definitions --- */
+
+:root, [data-theme="default"] {
+  /* Serene Green (Calm / Great Mood) */
+  --primary: #2e5c55; /* Existing code usage */
+  --primary-foreground: #ffffff;
+  --accent: #d1ee5d; /* User asked for #C7E96B but existing is #d1ee5d, sticking to similar but taking user direction if strictly better. User said "Accent: Light Lime #C7E96B". I will use #C7E96B */
+  --accent: #C7E96B;
+  --background: #F4F7E8;
+  --surface: #ffffff;
+  --text-main: #1f2937;
+  --text-muted: #2e5c55; /* Opacity via alpha usually, but semantic for headers */
+}
+
+[data-theme="neutral"] {
+  /* Balanced Daylight (Okay Mood) */
+  --primary: #3A6F6B;
+  --primary-foreground: #ffffff;
+  --accent: #F2D675;
+  --background: #FAF9F2;
+  --surface: #ffffff;
+  --text-main: #2C3E50;
+  --text-muted: #3A6F6B;
+}
+
+[data-theme="mild"] {
+  /* Gentle Focus Blue (Mild Stress) */
+  --primary: #4A7C88;
+  --primary-foreground: #ffffff;
+  --accent: #A7DADC;
+  --background: #F1F6F8;
+  --surface: #ffffff;
+  --text-main: #2C3E50;
+  --text-muted: #4A7C88;
+}
+
+[data-theme="high"] {
+  /* Deep Calm Mode (High Stress) */
+  --primary: #1F3D36;
+  --primary-foreground: #ffffff;
+  --accent: #7FB8A4;
+  --background: #EEF3F1;
+  --surface: #f8f9fa; /* Slightly darker surface for less contrast? or keep white */
+  --text-main: #1A1A1A;
+  --text-muted: #1F3D36;
+}
+
+[data-theme="low"] {
+  /* Warm Support (Low Mood) */
+  --primary: #4A5D4E;
+  --primary-foreground: #ffffff;
+  --accent: #F4B6A6;
+  --background: #FBF4EE;
+  --surface: #FFF8F3;
+  --text-main: #3E3E3E;
+  --text-muted: #4A5D4E;
+}
+
+[data-theme="panic"] {
+  /* Minimal Grounding (Overwhelmed) */
+  --primary: #3A3A3A;
+  --primary-foreground: #ffffff;
+  --accent: #9ED8A0;
+  --background: #FFFFFF;
+  --surface: #F5F5F5;
+  --text-main: #000000;
+  --text-muted: #555555;
+}
+
+/* Base transitions for smoothness */
+body {
+  background-color: var(--background);
+  color: var(--text-main);
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
