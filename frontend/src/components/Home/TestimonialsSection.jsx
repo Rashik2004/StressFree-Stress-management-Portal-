@@ -30,6 +30,8 @@ const TestimonialsSection = () => {
 
   if (loading) return <div className="py-24 text-center text-primary flex justify-center"><Loader className="w-16 h-16" /></div>;
 
+  if (testimonials.length === 0) return null; // Don't render if no data
+
   const activeTestimonial = testimonials.find(t => t._id === activeId) || testimonials[0];
 
   return (
