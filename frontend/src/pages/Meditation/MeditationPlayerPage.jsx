@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Play, Pause, RotateCcw, CheckCircle, Volume2, SkipBack, SkipForward, Info, Activity, Calendar, Clock } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import dashboardService from '../../features/dashboardService';
 import { ThemeContext } from '../../context/ThemeContext';
@@ -36,7 +36,7 @@ const MeditationPlayerPage = () => {
     useEffect(() => {
         const fetchSession = async () => {
             try {
-                const res = await axios.get(`/api/meditations/session/${sessionId}`);
+                const res = await api.get(`/meditations/session/${sessionId}`);
                 setSession(res.data);
                 setTimeLeft(res.data.duration);
             } catch (err) {

@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Play, Sparkles } from 'lucide-react';
 import Loader from '../../components/Common/Loader';
-import axios from 'axios';
+import api from '../../services/api';
 
 const MeditationTagPage = () => {
     const { tag } = useParams();
@@ -16,7 +16,7 @@ const MeditationTagPage = () => {
         const fetchByTag = async () => {
             try {
                 // Using the new tag endpoint
-                const res = await axios.get(`/api/meditations/tag/${tag}`);
+                const res = await api.get(`/meditations/tag/${tag}`);
 
                 // The backend returns { _id, title, description, sessions: [] }
                 setPageData(res.data);

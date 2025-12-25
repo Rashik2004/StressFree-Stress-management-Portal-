@@ -4,8 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Clock, Play, Leaf, Sparkles } from 'lucide-react';
 import Loader from '../../components/Common/Loader';
-import axios from 'axios';
-
+import api from '../../services/api';
 
 const MeditationCategoryPage = () => {
     const { categoryId } = useParams();
@@ -16,7 +15,7 @@ const MeditationCategoryPage = () => {
     useEffect(() => {
         const fetchCategory = async () => {
             try {
-                const res = await axios.get(`/api/meditations/category/${categoryId}`);
+                const res = await api.get(`/meditations/category/${categoryId}`);
                 setCategory(res.data);
                 setSessions(res.data.sessions || []);
             } catch (err) {

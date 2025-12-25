@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { PlayCircle, Clock } from 'lucide-react';
 import Loader from '../Common/Loader';
-import axios from 'axios';
+import api from '../../services/api';
 
 const GuidedSessions = () => {
     const [sessions, setSessions] = useState([]);
@@ -14,14 +14,14 @@ const GuidedSessions = () => {
         const fetchData = async () => {
             try {
                 // 1. Get Category ID for "Guided Meditation"
-                const catRes = await axios.get('/api/meditations/categories');
+                const catRes = await api.get('/meditations/categories');
                 const guidedCat = catRes.data.find(c => c.title === "Guided Meditation");
 
                 if (guidedCat) {
                     setCategoryId(guidedCat._id);
 
                     // 2. Get Sessions for this category
-                    const categoryRes = await axios.get(`/api/meditations/category/${guidedCat._id}`);
+                    const categoryRes = await api.get(`/meditations/category/${guidedCat._id}`);
                     // Take first 4
                     setSessions(categoryRes.data.sessions.slice(0, 4));
                 }

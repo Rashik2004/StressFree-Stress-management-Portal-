@@ -8,17 +8,19 @@ const iconMap = {
   Brain, Wind, Activity, Mic, Heart, Sun, Anchor, Moon, Music, CloudRain, Headphones
 };
 
+import api from '../../services/api';
+
 const MeditationTypes = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get('/api/meditations/categories');
+        const res = await api.get('/meditations/categories');
         setCategories(res.data);
-      } catch (err) {
-        console.error("Error fetching categories:", err);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
       } finally {
         setLoading(false);
       }
