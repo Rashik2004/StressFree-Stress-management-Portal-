@@ -4,6 +4,9 @@ import { Plus, Minus } from 'lucide-react';
 
 import api from '../../services/api';
 
+
+import Loader from '../Common/Loader';
+
 const FAQSection = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [faqs, setFaqs] = useState([]);
@@ -27,7 +30,7 @@ const FAQSection = () => {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
-  if (loading) return <div className="py-24 text-center">Loading FAQs...</div>;
+  if (loading) return <Loader className="py-24" />;
 
   return (
     <section className="py-24 bg-background relative overflow-hidden transition-colors duration-500">

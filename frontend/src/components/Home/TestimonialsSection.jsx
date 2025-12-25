@@ -28,7 +28,7 @@ const TestimonialsSection = () => {
 
   }, []);
 
-  if (loading) return <div className="py-24 text-center text-primary flex justify-center"><Loader className="w-16 h-16" /></div>;
+  if (loading) return <Loader className="py-24" />;
 
   if (testimonials.length === 0) return null; // Don't render if no data
 

@@ -8,6 +8,9 @@ const iconMap = {
 
 
 
+
+import Loader from '../Common/Loader';
+
 const FeaturesBenefits = () => {
   const [features, setFeatures] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +29,7 @@ const FeaturesBenefits = () => {
     fetchFeatures();
   }, []);
 
-  if (loading) return <div className="py-24 text-center text-primary">Loading features...</div>;
+  if (loading) return <Loader className="py-24" />;
   return (
     <section className="py-24 bg-surface text-primary relative overflow-hidden transition-colors duration-500">
       <div className="container mx-auto px-6 max-w-7xl">
