@@ -16,9 +16,9 @@ const AuthPage = () => {
   return (
     <div className="flex h-[calc(100vh-64px)] w-full overflow-hidden bg-surface">
       {/* Left Side - Form Section */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-surface relative z-10">
-        <div className="w-full max-w-md mx-auto">
-          <div className="mb-8 text-center">
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-surface relative z-10 overflow-y-auto">
+        <div className="w-full max-w-md mx-auto my-auto">
+          <div className="mb-8 text-center pt-8">
             <h1 className="text-4xl font-bold text-primary mb-2">
               {isLogin ? 'Welcome Back' : 'Create Account'}
             </h1>
@@ -62,7 +62,7 @@ const AuthPage = () => {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.3 }}
-                  className="absolute w-full"
+                  className="w-full"
                 >
                   <LoginForm />
                 </motion.div>
@@ -73,7 +73,7 @@ const AuthPage = () => {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="absolute w-full"
+                  className="w-full pb-8"
                 >
                   <RegisterForm />
                 </motion.div>
