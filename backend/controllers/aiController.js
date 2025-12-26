@@ -88,6 +88,13 @@ const chatResponse = asyncHandler(async (req, res) => {
   console.log("Chat Request User ID:", req.user ? req.user.id : "NO_USER");
 
   const { message } = req.body;
+  if (!message) {
+    res.status(400);
+    throw new Error("Message required");
+  }
+  let responseText = "";
+  let suggestion = null;
+
   if (!req.user || !req.user.id) {
     res.status(401);
     throw new Error("User context missing in controller");
@@ -104,7 +111,7 @@ const chatResponse = asyncHandler(async (req, res) => {
   const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
   const match = (patterns) =>
-    patterns.some((p) => new RegExp(`\\b${p}\\b`, "i").test(input));
+    patterns.some((p) => new RegExp(`\\b${p}\\b`, "i").test(message));
 
   if (match(["hello", "hi", "hey", "greetings"])) {
     responseText = pick([
