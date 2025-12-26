@@ -187,6 +187,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       "chaos",
       "overwhelmed",
       "pressure",
+      "hectic",
     ])
   ) {
     responseText = pick([
@@ -218,8 +219,8 @@ const chatResponse = asyncHandler(async (req, res) => {
       "Deadlines are important, but you are more important. Pace yourself.",
     ]);
     suggestion = {
-      title: "Quick Focus Reset",
-      link: "/meditations/tag/focus",
+      title: "Work Stress Relief",
+      link: "/meditations/tag/anxiety",
     };
   } else if (match(["sad", "cry", "crying", "depressed", "hopeless", "down"])) {
     responseText = pick([
