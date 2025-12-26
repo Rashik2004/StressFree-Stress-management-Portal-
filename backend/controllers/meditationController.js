@@ -71,9 +71,30 @@ const getSessionsByTag = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Search sessions by keyword
+// @route   GET /api/meditations/search?query=...
+// @access  Public
+const searchSessions = asyncHandler(async (req, res) => {
+  const keyword = req.query.query;
+
+  if (!keyword) {
+    res.status(400);
+    throw new Error("Search query required");
+  }
+
+  const keywordRegex = new RegExp(keyword, "i");
+
+  const sessions = await MeditationSession.find({
+    $or: [{ title: keywordRegex }, { tags: keywordRegex }],
+  });
+
+  res.status(200).json(sessions);
+});
+
 module.exports = {
   getCategories,
   getCategoryById,
   getSessionById,
   getSessionsByTag,
+  searchSessions,
 };
