@@ -10,7 +10,7 @@ const getDashboardData = async (token) => {
     },
   };
 
-  const response = await api.get("/dashboard/", config);
+  const response = await api.get("/dashboard", config);
   return response.data;
 };
 
