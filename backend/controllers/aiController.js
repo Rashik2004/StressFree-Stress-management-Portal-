@@ -111,7 +111,7 @@ const chatResponse = asyncHandler(async (req, res) => {
   const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
   const match = (patterns) =>
-    patterns.some((p) => new RegExp(`\\b${p}\\b`, "i").test(message));
+    patterns.some((p) => new RegExp(p, "i").test(message));
 
   if (match(["hello", "hi", "hey", "greetings"])) {
     responseText = pick([
@@ -176,7 +176,18 @@ const chatResponse = asyncHandler(async (req, res) => {
       link: "/meditations/tag/sleep",
     };
   } else if (
-    match(["anxious", "panic", "worried", "nervous", "scared", "fear"])
+    match([
+      "anxious",
+      "panic",
+      "worried",
+      "nervous",
+      "scared",
+      "fear",
+      "stress",
+      "chaos",
+      "overwhelmed",
+      "pressure",
+    ])
   ) {
     responseText = pick([
       "I hear the anxiety in your words. Let's pause. You are safe in this moment.",
@@ -188,7 +199,18 @@ const chatResponse = asyncHandler(async (req, res) => {
       link: "/meditations/tag/anxiety",
     };
   } else if (
-    match(["work", "deadline", "busy", "job", "career", "study", "exam"])
+    match([
+      "work",
+      "deadline",
+      "busy",
+      "job",
+      "career",
+      "study",
+      "exam",
+      "office",
+      "boss",
+      "meeting",
+    ])
   ) {
     responseText = pick([
       "The pressure to perform is heavy. Remember, you can only do one thing at a time.",
@@ -219,8 +241,28 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Gratitude Flow",
       link: "/meditations/tag/gratitude",
     };
-  } else if (match(["thank", "thanks"])) {
+  } else if (match(["thank", "thanks", "gratitude"])) {
     responseText = "You're very welcome. I'm always here if you need to talk.";
+  } else if (
+    match([
+      "suggest",
+      "recommend",
+      "advice",
+      "help",
+      "what should i do",
+      "guide",
+      "tip",
+    ])
+  ) {
+    responseText = pick([
+      "Sometimes the best thing to do is stop and breathe. Shall we try a short session?",
+      "I can suggest a quick practice to help you reset. How does that sound?",
+      "If you're unsure, starting with a 3-minute breathing exercise is always a good idea.",
+    ]);
+    suggestion = {
+      title: "Mindful Breathing",
+      link: "/meditations/tag/mindfulness",
+    };
   } else {
     // Randomized Fallbacks
     const fallbacks = [
