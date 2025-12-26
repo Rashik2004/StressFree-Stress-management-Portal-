@@ -115,11 +115,11 @@ const chatResponse = asyncHandler(async (req, res) => {
 
   if (match(["hello", "hi", "hey", "greetings"])) {
     responseText = pick([
-      `Hello ${
-        user.name ? user.name.split(" ")[0] : "Friend"
-      }! I'm listening. How is your day going?`,
-      `Hi there! I'm here for you. What's on your mind?`,
-      `Greetings! I hope you're having a gentle day. How are you feeling?`,
+      `Welcome to this moment, ${
+        user.name ? user.name.split(" ")[0] : "friend"
+      }. I am here to hold space for you. How is your spirit today?`,
+      `Hi there. The present moment is a gift. What would you like to explore together?`,
+      `Greetings. Take a deep breath with me. How are you feeling right now?`,
     ]);
   } else if (match(["name", "who are you"])) {
     responseText =
@@ -136,9 +136,9 @@ const chatResponse = asyncHandler(async (req, res) => {
     ])
   ) {
     responseText = pick([
-      "Being an introvert is a strength, not a flaw. You don't need to change who you are to be worthy of friendship.",
-      "It hurts when people judge our nature. Your quietness allows for deep thought and observation. Value that.",
-      "There is nothing wrong with being selective socially. Quality matters more than quantity.",
+      "Your introversion is a beautiful sanctuary, not a wall. In silence, you find your true strength.",
+      "The quiet ones often notice what others miss. Honor your need for solitude—it is where you recharge.",
+      "Society praises noise, but peace is found in stillness. There is nothing wrong with being selective with your energy.",
     ]);
     suggestion = {
       title: "Self-Acceptance Flow",
@@ -157,9 +157,9 @@ const chatResponse = asyncHandler(async (req, res) => {
     ])
   ) {
     responseText = pick([
-      "Relationships can be complex. It sounds like you're feeling undervalued. Remember your worth isn't defined by others.",
-      "Feeling ignored is incredibly painful. It often says more about them than you. How does this make you feel physically?",
-      "Connection is a human need, but so is self-respect. You deserve people who answer back.",
+      "Even in solitude, you are connected to the breath of life that flows through everyone. You are never truly alone.",
+      "Loneliness is just an uninvited guest. Invite it in for tea, listen to what it needs, and treat yourself with the kindness you seek.",
+      "The most important relationship you will ever have is with yourself. Nurture it with compassion today.",
     ]);
     suggestion = {
       title: "Loving Kindness Meditation",
@@ -167,9 +167,9 @@ const chatResponse = asyncHandler(async (req, res) => {
     };
   } else if (match(["tired", "exhausted", "sleep", "insomnia", "drained"])) {
     responseText = pick([
-      "It sounds like you're running on empty. Physical rest is just as important as mental effort.",
-      "Your body is asking for a pause. Listening to it is an act of courage, not laziness.",
-      "Exhaustion is a signal. Let's try to wind down gently.",
+      "Rest is a sacred act, not a waste of time. Your body is asking for permission to let go.",
+      "The world will keep spinning while you rest. surrender to the gravity of sleep.",
+      "Exhaustion is your body's way of saying 'Enough'. Listen to it with kindness.",
     ]);
     suggestion = {
       title: "Deep Sleep Release",
@@ -191,9 +191,9 @@ const chatResponse = asyncHandler(async (req, res) => {
     ])
   ) {
     responseText = pick([
-      "I hear the anxiety in your words. Let's pause. You are safe in this moment.",
-      "Anxiety tries to predict the future. Let's bring our focus back to right now.",
-      "Take a slow breath. This feeling will pass, like a cloud moving across the sky.",
+      "Anxiety is like a storm, but you are the sky. The sky is never damaged by the storm. This too shall pass.",
+      "Notice your feet on the floor. You are here, in this physical reality. The future is just a thought. Come back to now.",
+      "Take a deep breath. Notice that right now, in this second, you are safe. Let the worry drift by like clouds.",
     ]);
     suggestion = {
       title: "5-Minute Grounding",
@@ -214,9 +214,9 @@ const chatResponse = asyncHandler(async (req, res) => {
     ])
   ) {
     responseText = pick([
-      "The pressure to perform is heavy. Remember, you can only do one thing at a time.",
-      "Productivity shouldn't come at the cost of your sanity. What's one small thing you can control right now?",
-      "Deadlines are important, but you are more important. Pace yourself.",
+      "We can only do one thing at a time effectively. Breathe. Just do the next right thing.",
+      "You are not a machine. Productivity without presence is just busy-work. Take a conscious breath before you continue.",
+      "The work will always be there, but this moment is fleeting. Can you find a moment of stillness amidst the chaos?",
     ]);
     suggestion = {
       title: "Work Stress Relief",
@@ -224,9 +224,9 @@ const chatResponse = asyncHandler(async (req, res) => {
     };
   } else if (match(["sad", "cry", "crying", "depressed", "hopeless", "down"])) {
     responseText = pick([
-      "I'm so sorry you're going through this. It's okay to let it out.",
-      "Sadness is a heavy coat to wear. Be gentle with yourself today.",
-      "You don't have to carry it all alone. I'm here listening.",
+      "It is brave to feel deep sadness. It cleanses the soul. Let the tears flow if they need to.",
+      "Hold this sadness like a small child. Do not push it away. Offer it your compassion.",
+      "Darkness is a part of the cycle, just like night. The sun will rise again, but for now, it's okay to rest in the dark.",
     ]);
     suggestion = {
       title: "Healing Light Visualization",
@@ -234,16 +234,16 @@ const chatResponse = asyncHandler(async (req, res) => {
     };
   } else if (match(["good", "great", "happy", "amazing", "awesome"])) {
     responseText = pick([
-      "I'm so happy to hear that! It's wonderful when things go well.",
-      "That's fantastic! Hold onto this feeling of joy.",
-      "Celebrating these moments builds resilience. Enjoy it!",
+      "Wonderful. Savor this feeling. Let it fill every cell of your body.",
+      "Joy is the natural state of a free mind. Enjoy this beautiful moment.",
+      "Gratitude turns what we have into enough. Thank you for sharing your light.",
     ]);
     suggestion = {
       title: "Gratitude Flow",
       link: "/meditations/tag/gratitude",
     };
   } else if (match(["thank", "thanks", "gratitude"])) {
-    responseText = "You're very welcome. I'm always here if you need to talk.";
+    responseText = "Namaste. I am honored to walk this path with you.";
   } else if (
     match([
       "suggest",
@@ -256,9 +256,9 @@ const chatResponse = asyncHandler(async (req, res) => {
     ])
   ) {
     responseText = pick([
-      "Sometimes the best thing to do is stop and breathe. Shall we try a short session?",
-      "I can suggest a quick practice to help you reset. How does that sound?",
-      "If you're unsure, starting with a 3-minute breathing exercise is always a good idea.",
+      "The answer often lies in silence. Shall we sit together for a moment?",
+      "Trust your intuition. A clear mind makes better decisions. Let's clear the fog.",
+      "Sometimes the most productive thing to do is to stop. I recommend a short pause.",
     ]);
     suggestion = {
       title: "Mindful Breathing",
@@ -267,11 +267,11 @@ const chatResponse = asyncHandler(async (req, res) => {
   } else {
     // Randomized Fallbacks
     const fallbacks = [
-      "I hear you. Can you tell me more about that?",
-      "That sounds significant. How does that impact your mood properly?",
-      "I'm listening. Please go on.",
-      "Thank you for sharing that with me. What do you think would help right now?",
-      "I see. Thoughts like that can be heavy. Do you want to try a distraction?",
+      "I hear you. Can you close your eyes and take one deep breath for me?",
+      "That sounds intense. Where do you feel that emotion in your body right now?",
+      "I am here. Take your time. There is no rush.",
+      "Thank you for sharing. Awareness is the first step to freedom. What do you need most right now?",
+      "Let's slow down. Thoughts come and go. Which one is troubling you the most?",
     ];
     responseText = pick(fallbacks);
   }
