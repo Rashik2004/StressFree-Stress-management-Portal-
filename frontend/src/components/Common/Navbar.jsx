@@ -118,6 +118,12 @@ const Navbar = () => {
                     placeholder="Search..."
                     className="bg-transparent border-none outline-none text-white text-sm ml-2 w-full placeholder-white/50"
                     autoFocus
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            navigate(`/meditations?search=${e.target.value}`);
+                            setIsSearchOpen(false);
+                        }
+                    }}
                 />
             )}
         </div>
