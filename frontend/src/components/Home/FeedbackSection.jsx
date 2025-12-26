@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Star, Send, User, Briefcase, MessageSquare } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api';
 
 const FeedbackSection = () => {
     const { user } = useContext(AuthContext);
