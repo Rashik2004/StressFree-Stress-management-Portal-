@@ -32,7 +32,7 @@ const Contribution = () => {
                 </div>
                 <h3 className="font-bold text-primary text-xl mb-3">Code</h3>
                 <p className="text-primary/60 mb-4">We are Open Source! Help us build features and fix bugs on GitHub.</p>
-                <button className="text-primary font-bold hover:underline">View GitHub &rarr;</button>
+                <a href="https://github.com/Rashik2004/StressFree-Stress-management-Portal-/tree/main" target="_blank" rel="noopener noreferrer" className="text-primary font-bold hover:underline"><button className="text-primary font-bold hover:underline"> a View GitHub &rarr;</button></a>
             </div>
 
             <div className="bg-surface p-8 rounded-2xl shadow-sm border border-primary/10 hover:shadow-md transition-shadow">

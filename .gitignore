@@ -1,1 +1,5 @@
 .config/
+
+# SDLC Reports
+SDLC_Report.md
+SDLC_Chapter_*.md
