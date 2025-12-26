@@ -188,6 +188,14 @@ const chatResponse = asyncHandler(async (req, res) => {
       "overwhelmed",
       "pressure",
       "hectic",
+      "dread",
+      "shaky",
+      "racing",
+      "tension",
+      "unease",
+      "doom",
+      "restless",
+      "edge",
     ])
   ) {
     responseText = pick([
@@ -211,6 +219,16 @@ const chatResponse = asyncHandler(async (req, res) => {
       "office",
       "boss",
       "meeting",
+      "project",
+      "task",
+      "email",
+      "call",
+      "zoom",
+      "presentation",
+      "interview",
+      "manager",
+      "overtime",
+      "burnout",
     ])
   ) {
     responseText = pick([
@@ -222,7 +240,25 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Work Stress Relief",
       link: "/meditations/tag/anxiety",
     };
-  } else if (match(["sad", "cry", "crying", "depressed", "hopeless", "down"])) {
+  } else if (
+    match([
+      "sad",
+      "cry",
+      "crying",
+      "depressed",
+      "hopeless",
+      "down",
+      "blue",
+      "heavy",
+      "hollow",
+      "numb",
+      "miserable",
+      "unhappy",
+      "gloom",
+      "tears",
+      "empty",
+    ])
+  ) {
     responseText = pick([
       "It is brave to feel deep sadness. It cleanses the soul. Let the tears flow if they need to.",
       "Hold this sadness like a small child. Do not push it away. Offer it your compassion.",
@@ -231,6 +267,18 @@ const chatResponse = asyncHandler(async (req, res) => {
     suggestion = {
       title: "Healing Light Visualization",
       link: "/meditations/tag/healing",
+    };
+  } else if (
+    match(["morning", "wake", "woke", "start", "day", "early", "rise"])
+  ) {
+    responseText = pick([
+      "Good morning. How you start your day sets the tone for everything else. Shall we set an intention?",
+      "Rise and shine. The world awaits your unique light. What is one thing you are looking forward to?",
+      "Morning is a fresh page. You have the power to write a beautiful story today.",
+    ]);
+    suggestion = {
+      title: "Morning Clarity",
+      link: "/meditations/tag/focus",
     };
   } else if (match(["good", "great", "happy", "amazing", "awesome"])) {
     responseText = pick([
@@ -263,6 +311,94 @@ const chatResponse = asyncHandler(async (req, res) => {
     suggestion = {
       title: "Mindful Breathing",
       link: "/meditations/tag/mindfulness",
+    };
+  } else if (
+    match([
+      "angry",
+      "mad",
+      "furious",
+      "annoyed",
+      "irritated",
+      "rage",
+      "hate",
+      "pissed",
+      "resentment",
+      "temper",
+    ])
+  ) {
+    responseText = pick([
+      "Anger is a powerful energy, like fire. Instead of fighting it, can we sit with it and watch it burn safely?",
+      "It makes sense to feel angry. Your boundaries may have been crossed. Breathe into the heat without acting on it.",
+      "Underneath anger is often hurt. Let yourself feel the fire without letting it consume you.",
+    ]);
+    suggestion = {
+      title: "Transforming Anger",
+      link: "/meditations/tag/emotions",
+    };
+  } else if (
+    match([
+      "confused",
+      "lost",
+      "unsure",
+      "doubt",
+      "decision",
+      "choice",
+      "uncertain",
+      "clarity",
+      "direction",
+    ])
+  ) {
+    responseText = pick([
+      "When the water is muddy, we cannot see the bottom. Be still, and the mud will settle on its own.",
+      "Confusion is just the mind trying to control the uncontrollable. Let go of the need to know right now.",
+      "The answer is already within you. It is just quiet. Listen to the silence between your thoughts.",
+    ]);
+    suggestion = {
+      title: "Finding Clarity",
+      link: "/meditations/tag/focus",
+    };
+  } else if (
+    match([
+      "pain",
+      "hurt",
+      "sick",
+      "headache",
+      "ache",
+      "body",
+      "physical",
+      "ill",
+      "sore",
+    ])
+  ) {
+    responseText = pick([
+      "Your body is speaking to you. Listen with kindness, not judgment. Send breath to the area of discomfort.",
+      "Pain is a sensation. Suffering is our resistance to it. Can you soften around the edges of the feeling?",
+      "Be gentle with your vessel. It carries you through this life. Rest is the best medicine right now.",
+    ]);
+    suggestion = {
+      title: "Body Scan for Pain",
+      link: "/meditations/tag/body-scan",
+    };
+  } else if (
+    match([
+      "grief",
+      "loss",
+      "died",
+      "passed",
+      "miss",
+      "mourning",
+      "heartbroken",
+      "broken",
+    ])
+  ) {
+    responseText = pick([
+      "Grief is the price we pay for love. It is a heavy, sacred weight. Do not rush to put it down.",
+      "There is no timeline for healing. Your heart is processing a great change. Be patient with yourself.",
+      "The ones we love are never truly gone; they live in the quiet corners of our heart. Honor your memory of them.",
+    ]);
+    suggestion = {
+      title: "Healing Grief",
+      link: "/meditations/tag/healing",
     };
   } else {
     // Randomized Fallbacks
