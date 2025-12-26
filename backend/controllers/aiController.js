@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 const MeditationSession = require("../models/MeditationSession");
+const ChatLog = require("../models/ChatLog");
 
 // @desc    Submit Assessment & Generate Plan
 // @route   POST /api/ai/assess
@@ -94,6 +95,7 @@ const chatResponse = asyncHandler(async (req, res) => {
   }
   let responseText = "";
   let suggestion = null;
+  let detectedSentiment = "Neutral";
 
   if (!req.user || !req.user.id) {
     res.status(401);
@@ -121,6 +123,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       `Hi there. The present moment is a gift. What would you like to explore together?`,
       `Greetings. Take a deep breath with me. How are you feeling right now?`,
     ]);
+    detectedSentiment = "Greeting";
   } else if (match(["name", "who are you"])) {
     responseText =
       "I'm your AI stress companion. You can call me MindfulBot. I'm here to support you.";
@@ -141,9 +144,9 @@ const chatResponse = asyncHandler(async (req, res) => {
       "Society praises noise, but peace is found in stillness. There is nothing wrong with being selective with your energy.",
     ]);
     suggestion = {
-      title: "Self-Acceptance Flow",
       link: "/meditations/tag/healing",
     };
+    detectedSentiment = "Introversion";
   } else if (
     match([
       "friend",
@@ -165,6 +168,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Loving Kindness Meditation",
       link: "/meditations/tag/loving-kindness",
     };
+    detectedSentiment = "Loneliness";
   } else if (match(["tired", "exhausted", "sleep", "insomnia", "drained"])) {
     responseText = pick([
       "Rest is a sacred act, not a waste of time. Your body is asking for permission to let go.",
@@ -175,6 +179,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Deep Sleep Release",
       link: "/meditations/tag/sleep",
     };
+    detectedSentiment = "Tiredness";
   } else if (
     match([
       "anxious",
@@ -207,6 +212,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "5-Minute Grounding",
       link: "/meditations/tag/anxiety",
     };
+    detectedSentiment = "Anxiety";
   } else if (
     match([
       "work",
@@ -240,6 +246,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Work Stress Relief",
       link: "/meditations/tag/anxiety",
     };
+    detectedSentiment = "Work Stress";
   } else if (
     match([
       "sad",
@@ -268,6 +275,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Healing Light Visualization",
       link: "/meditations/tag/healing",
     };
+    detectedSentiment = "Sadness";
   } else if (
     match(["morning", "wake", "woke", "start", "day", "early", "rise"])
   ) {
@@ -280,6 +288,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Morning Clarity",
       link: "/meditations/tag/focus",
     };
+    detectedSentiment = "Morning";
   } else if (match(["good", "great", "happy", "amazing", "awesome"])) {
     responseText = pick([
       "Wonderful. Savor this feeling. Let it fill every cell of your body.",
@@ -290,8 +299,10 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Gratitude Flow",
       link: "/meditations/tag/gratitude",
     };
+    detectedSentiment = "Happiness";
   } else if (match(["thank", "thanks", "gratitude"])) {
     responseText = "Namaste. I am honored to walk this path with you.";
+    detectedSentiment = "Gratitude";
   } else if (
     match([
       "suggest",
@@ -312,6 +323,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Mindful Breathing",
       link: "/meditations/tag/mindfulness",
     };
+    detectedSentiment = "Advice";
   } else if (
     match([
       "angry",
@@ -335,6 +347,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Transforming Anger",
       link: "/meditations/tag/emotions",
     };
+    detectedSentiment = "Anger";
   } else if (
     match([
       "confused",
@@ -357,6 +370,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Finding Clarity",
       link: "/meditations/tag/focus",
     };
+    detectedSentiment = "Confusion";
   } else if (
     match([
       "pain",
@@ -379,6 +393,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Body Scan for Pain",
       link: "/meditations/tag/body-scan",
     };
+    detectedSentiment = "Pain";
   } else if (
     match([
       "grief",
@@ -400,6 +415,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       title: "Healing Grief",
       link: "/meditations/tag/healing",
     };
+    detectedSentiment = "Grief";
   } else {
     // Randomized Fallbacks
     const fallbacks = [
@@ -413,6 +429,19 @@ const chatResponse = asyncHandler(async (req, res) => {
   }
 
   // Simulate "Typing" delay in client, but here just return
+  // Save log to DB
+  try {
+    await ChatLog.create({
+      user: user._id,
+      message,
+      response: responseText,
+      sentiment: detectedSentiment,
+    });
+  } catch (err) {
+    console.error("Failed to save chat log:", err);
+    // Don't fail the response if logging fails
+  }
+
   res.status(200).json({
     response: responseText,
     suggestion: suggestion,
