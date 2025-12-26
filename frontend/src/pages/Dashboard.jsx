@@ -54,36 +54,28 @@ const Dashboard = () => {
     return (
     <div className="min-h-screen bg-background font-sans selection:bg-accent selection:text-primary transition-colors duration-500">
 
-      {/* Left Sidebar */}
       <Sidebar />
 
-      {/* Main Content Area */}
       <div className="pl-20 lg:pl-64 transition-all duration-300">
         <div className="p-4 md:p-8 max-w-7xl mx-auto pb-32">
 
-            {/* 1. Header Section */}
             <WelcomeHeader summary={summary} />
 
-            {/* 2. Main Bento Grid */}
             <div className="grid grid-cols-12 gap-4 lg:gap-6">
 
-                {/* Row 1: Hero Recommendation + Mood Logger */}
                 <TodayRecommendation data={data?.recommendation} />
                 <div className="col-span-12 lg:col-span-4 h-full">
                     <MoodLogger onLogSuccess={() => {}} />
                 </div>
 
-                {/* Row 2: Quick Actions */}
                 <QuickActions lastSession={data?.lastSession} breathingCategoryId={data?.breathingCategoryId} />
 
-                {/* Row 3: More Suggestions + Stats */}
                 <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
                      <RecommendedSessionsGrid sessions={data?.suggestedSessions} />
                      <InsightsCard />
                 </div>
 
                 <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
-                     {/* AI Assessment CTA */}
                      <div className="bg-[#2e5c55] rounded-3xl p-6 text-white relative overflow-hidden group min-h-[200px] flex flex-col justify-center">
                         <div className="absolute -top-4 -right-4 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
                             <Brain size={140} />
