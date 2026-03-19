@@ -3,5 +3,6 @@
   "builder.command": "npm run dev\n",
   "builder.runDevServer": true,
   "builder.autoDetectDevServer": false,
-  "builder.launchType": "editor"
+  "builder.launchType": "editor",
+  "snyk.advanced.autoSelectOrganization": true
 }
