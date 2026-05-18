@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+
+  backend:
+    build: ./backend
+    container_name: stress-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build: ./frontend
+    container_name: stress-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  mongodb:
+    image: mongo:7
+    container_name: stress-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: RashDB
+      MONGO_INITDB_ROOT_PASSWORD: "@Priyanshu1918"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
