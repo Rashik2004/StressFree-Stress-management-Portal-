@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send, Smile, Loader } from "lucide-react";
+import { motion as Motion, AnimatePresence } from "framer-motion";
+import { MessageCircle, X, Send, Smile } from "lucide-react";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import aiService from "../../features/aiService";
@@ -19,6 +19,8 @@ const Chatbot = () => {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const isMountedRef = useRef(true);
 
   const { user } = useContext(AuthContext);
 
@@ -31,6 +33,17 @@ const Chatbot = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isOpen]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -46,37 +59,49 @@ const Chatbot = () => {
     setInput("");
     setIsTyping(true);
 
-    try {
-      const token = user ? user.token : null;
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
 
-      if (!token) {
-        throw new Error("User not authenticated");
-      }
-
-      const data = await aiService.chatWithAI(userMessage.text, token);
-
-      setTimeout(() => {
-        const botResponse = {
-          id: Date.now() + 1,
-          sender: "bot",
-          text: data.response,
-          suggestion: data.suggestion
-        };
-        setMessages((prev) => [...prev, botResponse]);
-        setIsTyping(false);
-      }, 600); // 600ms artificial delay for "thinking" feel
-
-    } catch (error) {
-      console.error(error);
-      setIsTyping(false);
+    const addBotMessage = (text, suggestion) => {
+      if (!isMountedRef.current) return;
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 1,
           sender: "bot",
-          text: "I'm having trouble connecting right now. Please try again in a moment.",
+          text,
+          suggestion,
         },
       ]);
+      setIsTyping(false);
+    };
+
+    try {
+      const token = user?.token ?? null;
+
+      if (!token) {
+        timeoutRef.current = setTimeout(() => {
+          addBotMessage(
+            "I'm here to help, but I need you to sign in before I can continue.",
+          );
+        }, 600);
+        return;
+      }
+
+      const data = await aiService.chatWithAI(userMessage.text, token);
+
+      timeoutRef.current = setTimeout(() => {
+        addBotMessage(
+          data?.response || "I'm here with you. Would you like to try again?",
+          data?.suggestion,
+        );
+      }, 600);
+    } catch (error) {
+      console.error(error);
+      addBotMessage(
+        "I'm having trouble connecting right now. Please try again in a moment.",
+      );
     }
   };
 
@@ -86,7 +111,7 @@ const Chatbot = () => {
     <>
       <AnimatePresence>
         {isOpen && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -129,7 +154,7 @@ const Chatbot = () => {
                   >
                     <p>{msg.text}</p>
 
-                    {msg.suggestion && (
+                    {msg.suggestion?.link && msg.suggestion?.title && (
                        <div className="mt-3 p-2 bg-primary/5 rounded-lg border border-primary/10">
                          <p className="text-xs font-semibold text-gray-500 mb-1">Recommended for you:</p>
                          <Link
@@ -148,17 +173,17 @@ const Chatbot = () => {
                 <div className="flex justify-start">
                   <div className="bg-white dark:bg-gray-800 p-3 rounded-2xl rounded-bl-none shadow-sm border border-gray-100 dark:border-gray-700">
                     <div className="flex space-x-1.5">
-                      <motion.div
+                      <Motion.div
                         className="w-2 h-2 bg-gray-400 rounded-full"
                         animate={{ y: [0, -5, 0] }}
                         transition={{ duration: 0.6, repeat: Infinity }}
                       />
-                      <motion.div
+                      <Motion.div
                         className="w-2 h-2 bg-gray-400 rounded-full"
                         animate={{ y: [0, -5, 0] }}
                         transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
                       />
-                      <motion.div
+                      <Motion.div
                         className="w-2 h-2 bg-gray-400 rounded-full"
                         animate={{ y: [0, -5, 0] }}
                         transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
@@ -190,12 +215,12 @@ const Chatbot = () => {
                 <Send className="w-5 h-5 pl-0.5" />
               </button>
             </form>
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
 
       {/* Toggle Button */}
-      <motion.button
+      <Motion.button
             onClick={toggleChat}
             className="fixed bottom-6 right-6 p-4 bg-primary text-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.3)] z-[9999] group overflow-hidden"
             whileHover={{ scale: 1.05 }}
@@ -206,7 +231,7 @@ const Chatbot = () => {
 
             <AnimatePresence mode="wait">
                 {isOpen ? (
-                    <motion.div
+                    <Motion.div
                         key="close"
                         initial={{ opacity: 0, rotate: -90 }}
                         animate={{ opacity: 1, rotate: 0 }}
@@ -214,9 +239,9 @@ const Chatbot = () => {
                         transition={{ duration: 0.2 }}
                     >
                         <X className="w-6 h-6 relative z-10" />
-                    </motion.div>
+                    </Motion.div>
                 ) : (
-                    <motion.div
+                    <Motion.div
                         key="open"
                         initial={{ opacity: 0, rotate: 90 }}
                         animate={{ opacity: 1, rotate: 0 }}
@@ -224,10 +249,10 @@ const Chatbot = () => {
                         transition={{ duration: 0.2 }}
                     >
                         <MessageCircle className="w-6 h-6 relative z-10" />
-                    </motion.div>
+                    </Motion.div>
                 )}
             </AnimatePresence>
-        </motion.button>
+        </Motion.button>
     </>
   );
 };

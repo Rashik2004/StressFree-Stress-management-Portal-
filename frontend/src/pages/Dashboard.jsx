@@ -23,7 +23,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            if (user && user.token) {
+            if (user?.token) {
                 try {
                     const dashboardData = await dashboardService.getDashboardData(user.token);
                     setData(dashboardData);
@@ -39,10 +39,12 @@ const Dashboard = () => {
                 } finally {
                     setLoading(false);
                 }
+            } else {
+                setLoading(false);
             }
         };
         fetchData();
-    }, [user]);
+    }, [autoSetTheme, user]);
 
     if(loading) {
         return <div className="min-h-screen bg-background flex items-center justify-center"><Loader /></div>

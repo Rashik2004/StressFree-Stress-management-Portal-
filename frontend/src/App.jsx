@@ -49,12 +49,10 @@ function App() {
               <Route path="/meditations/:categoryId" element={<MeditationCategoryPage />} />
               <Route path="/meditations/tag/:tag" element={<MeditationTagPage />} />
               <Route path="/meditation-session/:sessionId" element={<MeditationPlayerPage />} />
-              <Route path="/assessment" element={<AssessmentPage />} />
-
-
               <Route element={<ProtectedRoute />}>
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/assessment" element={<AssessmentPage />} />
 
                 {/* Profile Routes */}
                 <Route path="/profile" element={<ProfileHub />} />

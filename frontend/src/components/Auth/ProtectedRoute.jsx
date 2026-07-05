@@ -14,8 +14,8 @@ const ProtectedRoute = () => {
       );
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  if (!user?.token) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   // Force Onboarding if not completed and not currently on that page

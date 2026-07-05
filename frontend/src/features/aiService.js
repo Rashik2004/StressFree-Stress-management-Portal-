@@ -20,6 +20,7 @@ const chatWithAI = async (message, token) => {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    timeout: 15000,
   };
 
   const response = await api.post("/ai/chat", { message }, config);

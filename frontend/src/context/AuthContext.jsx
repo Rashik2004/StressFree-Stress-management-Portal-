@@ -14,14 +14,30 @@ export const AuthProvider = ({ children }) => {
     try {
         // Check for existing user in localStorage
         const savedUser = JSON.parse(localStorage.getItem("user"));
-        if (savedUser) {
+        if (savedUser?.token) {
             setUser(savedUser);
+        } else if (savedUser) {
+            localStorage.removeItem("user");
         }
     } catch (error) {
         console.error("Failed to parse user from local storage", error);
         localStorage.removeItem("user");
     }
     setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setUser(null);
+      setIsSuccess(false);
+      setIsError(true);
+      setMessage("Your session expired. Please sign in again.");
+    };
+
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+    return () => {
+      window.removeEventListener("auth:unauthorized", handleUnauthorized);
+    };
   }, []);
 
   // Register User
@@ -32,6 +48,9 @@ export const AuthProvider = ({ children }) => {
     setMessage("");
     try {
       const data = await authService.register(userData);
+      if (!data?.token) {
+        throw new Error("Registration succeeded but no auth token was returned");
+      }
       setUser(data);
       setIsSuccess(true);
     } catch (error) {
@@ -55,6 +74,9 @@ export const AuthProvider = ({ children }) => {
     setMessage("");
     try {
       const data = await authService.login(userData);
+      if (!data?.token) {
+        throw new Error("Login succeeded but no auth token was returned");
+      }
       setUser(data);
       setIsSuccess(true);
     } catch (error) {
@@ -74,8 +96,11 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (userData) => {
     setIsLoading(true);
     try {
-      if (!user) throw new Error("User not authenticated");
+      if (!user?.token) throw new Error("User not authenticated");
       const updatedUser = await authService.updateProfile(userData, user.token);
+      if (!updatedUser?.token) {
+        throw new Error("Profile updated but no auth token was returned");
+      }
       setUser(updatedUser);
       setIsSuccess(true);
       return updatedUser;
@@ -120,7 +145,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         updateProfile,
         reset,
-        isAuthenticated: !!user
+        isAuthenticated: !!user?.token
     }}
     >
       {children}
