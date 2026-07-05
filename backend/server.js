@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/database");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 // Load env vars
 dotenv.config();
@@ -28,13 +29,21 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to Stress Management API" });
 });
 
+app.use(notFound);
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 5000;
 
 // Connect to database then start server
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(
-      `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
-    );
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(
+        `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`,
+      );
+    });
+  })
+  .catch((error) => {
+    console.error(`Server startup failed: ${error.message}`);
+    process.exit(1);
   });
-});

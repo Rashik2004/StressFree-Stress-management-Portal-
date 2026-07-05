@@ -1,10 +1,19 @@
 const User = require("../models/User");
 const asyncHandler = require("express-async-handler");
 const MeditationSession = require("../models/MeditationSession");
+const MeditationCategory = require("../models/MeditationCategory");
+
+const isValidScheduleInput = ({ title, time, day }) => title && time && day;
 
 /* --- Get Dashboard Data --- */
 const getDashboardData = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id).select("-password");
+  const userId = req.user?.id || req.user?._id;
+  if (!userId) {
+    res.status(401);
+    throw new Error("Not authorized, user context missing");
+  }
+
+  const user = await User.findById(userId).select("-password");
 
   if (!user) {
     res.status(404);
@@ -16,18 +25,18 @@ const getDashboardData = asyncHandler(async (req, res) => {
   today.setHours(0, 0, 0, 0);
 
   const todaysMoodLogs = user.moodLogs.filter(
-    (log) => new Date(log.date) >= today
+    (log) => new Date(log.date) >= today,
   );
   const todaysMoodLog =
     todaysMoodLogs.length > 0
       ? todaysMoodLogs[todaysMoodLogs.length - 1]
       : null;
   const todaysMeditation = user.meditationHistory.filter(
-    (h) => new Date(h.completedAt) >= today
+    (h) => new Date(h.completedAt) >= today,
   );
   const todaysMinutes = todaysMeditation.reduce(
     (acc, curr) => acc + curr.duration / 60,
-    0
+    0,
   );
 
   /* --- Recommendations Logic (Time of Day) --- */
@@ -50,7 +59,7 @@ const getDashboardData = asyncHandler(async (req, res) => {
     highlight = "Recharge Focus";
   }
 
-  const category = await require("../models/MeditationCategory").findOne({
+  const category = await MeditationCategory.findOne({
     title: { $regex: recommendationType, $options: "i" },
   });
   let recommendation = null;
@@ -69,21 +78,20 @@ const getDashboardData = asyncHandler(async (req, res) => {
           hour < 12
             ? "bg-[#e8a83e]"
             : hour >= 17
-            ? "bg-[#234842]"
-            : "bg-[#2e5c55]",
+              ? "bg-[#234842]"
+              : "bg-[#2e5c55]",
         buttonColor:
           hour < 12
             ? "text-[#e8a83e]"
             : hour >= 17
-            ? "text-[#234842]"
-            : "text-[#2e5c55]",
+              ? "text-[#234842]"
+              : "text-[#2e5c55]",
         categoryLink: `/meditations/${category._id}`,
       };
     }
   }
 
   /* --- Daily Stats (Current Week) --- */
-  const statsMap = {};
   const todayDate = new Date();
   const dayOfWeek = todayDate.getDay();
   const diff = todayDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
@@ -140,6 +148,7 @@ const getDashboardData = asyncHandler(async (req, res) => {
     }).limit(3);
 
     suggestedSessions = foundSessions.map((s) => ({
+      _id: s._id,
       title: s.title,
       duration: `${Math.round(s.duration / 60)} min`,
       type: "Recommended",
@@ -179,10 +188,9 @@ const getDashboardData = asyncHandler(async (req, res) => {
   }
 
   /* --- Quick Actions Categories --- */
-  const breathingCategory =
-    await require("../models/MeditationCategory").findOne({
-      title: { $regex: "Breathing", $options: "i" },
-    });
+  const breathingCategory = await MeditationCategory.findOne({
+    title: { $regex: "Breathing", $options: "i" },
+  });
 
   res.status(200).json({
     summary: {
@@ -205,16 +213,33 @@ const getDashboardData = asyncHandler(async (req, res) => {
 /* --- Log Mood --- */
 const logMood = asyncHandler(async (req, res) => {
   const { mood, stress, note } = req.body;
-  const user = await User.findById(req.user.id);
+  const userId = req.user?.id || req.user?._id;
+  if (!userId) {
+    res.status(401);
+    throw new Error("Not authorized, user context missing");
+  }
+
+  const user = await User.findById(userId);
 
   if (!user) {
     res.status(404);
     throw new Error("User not found");
   }
 
+  const parsedStress = Number(stress);
+  if (
+    !mood ||
+    Number.isNaN(parsedStress) ||
+    parsedStress < 1 ||
+    parsedStress > 10
+  ) {
+    res.status(400);
+    throw new Error("Mood and stress level from 1 to 10 are required");
+  }
+
   user.moodLogs.push({
     mood,
-    stress,
+    stress: parsedStress,
     note,
   });
 
@@ -224,27 +249,50 @@ const logMood = asyncHandler(async (req, res) => {
 
 /* --- Get Schedule --- */
 const getSchedule = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
+  const userId = req.user?.id || req.user?._id;
+  if (!userId) {
+    res.status(401);
+    throw new Error("Not authorized, user context missing");
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
   res.status(200).json(user.schedule);
 });
 
 /* --- Update Stats --- */
 const updateStats = asyncHandler(async (req, res) => {
   const { sessionId, duration } = req.body;
-  const user = await User.findById(req.user.id);
+  const userId = req.user?.id || req.user?._id;
+  if (!userId) {
+    res.status(401);
+    throw new Error("Not authorized, user context missing");
+  }
+
+  const user = await User.findById(userId);
 
   if (!user) {
     res.status(404);
     throw new Error("User not found");
   }
 
+  const parsedDuration = Number(duration);
+  if (!sessionId || Number.isNaN(parsedDuration) || parsedDuration <= 0) {
+    res.status(400);
+    throw new Error("Valid sessionId and duration are required");
+  }
+
   user.meditationHistory.push({
     session: sessionId,
-    duration: duration,
+    duration: parsedDuration,
     completedAt: Date.now(),
   });
 
-  user.stats.totalMinutes += Math.round(duration / 60);
+  user.stats.totalMinutes += Math.round(parsedDuration / 60);
 
   /* --- Streak Logic --- */
   const today = new Date();
@@ -274,21 +322,32 @@ const updateStats = asyncHandler(async (req, res) => {
 /* --- Add Schedule Item --- */
 const addScheduleItem = asyncHandler(async (req, res) => {
   const { title, time, day, meditationId } = req.body;
-  const user = await User.findById(req.user.id);
+  const userId = req.user?.id || req.user?._id;
+  if (!userId) {
+    res.status(401);
+    throw new Error("Not authorized, user context missing");
+  }
+
+  const user = await User.findById(userId);
 
   if (!user) {
     res.status(404);
     throw new Error("User not found");
   }
 
+  if (!isValidScheduleInput({ title, time, day })) {
+    res.status(400);
+    throw new Error("Title, time, and day are required");
+  }
+
   const alreadyScheduled = user.schedule.find(
-    (s) => s.day === day && s.time === time
+    (s) => s.day === day && s.time === time,
   );
 
   if (alreadyScheduled) {
     res.status(400);
     throw new Error(
-      "Reminder can't be set you already have schedule meditations"
+      "Reminder can't be set you already have schedule meditations",
     );
   }
 
@@ -307,7 +366,13 @@ const addScheduleItem = asyncHandler(async (req, res) => {
 
 /* --- Delete Schedule Item --- */
 const deleteScheduleItem = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
+  const userId = req.user?.id || req.user?._id;
+  if (!userId) {
+    res.status(401);
+    throw new Error("Not authorized, user context missing");
+  }
+
+  const user = await User.findById(userId);
   const { itemId } = req.params;
 
   if (!user) {
@@ -316,7 +381,7 @@ const deleteScheduleItem = asyncHandler(async (req, res) => {
   }
 
   user.schedule = user.schedule.filter(
-    (item) => item._id.toString() !== itemId
+    (item) => item._id.toString() !== itemId,
   );
   await user.save();
 

@@ -8,11 +8,22 @@ const ChatLog = require("../models/ChatLog");
 // @access  Private
 const submitAssessment = asyncHandler(async (req, res) => {
   const { answers } = req.body;
-  const user = await User.findById(req.user.id);
+  const userId = req.user?.id || req.user?._id;
+  if (!userId) {
+    res.status(401);
+    throw new Error("Not authorized, user context missing");
+  }
+
+  const user = await User.findById(userId);
 
   if (!user) {
     res.status(404);
     throw new Error("User not found");
+  }
+
+  if (!Array.isArray(answers) || answers.length === 0) {
+    res.status(400);
+    throw new Error("Assessment answers are required");
   }
 
   // Calculate Stress Score (Heuristic Algorithm)
@@ -21,14 +32,9 @@ const submitAssessment = asyncHandler(async (req, res) => {
 
   // Simple sum logic if answers are 0-3 scale
 
-  if (answers && Array.isArray(answers)) {
-    const totalScore = answers.reduce(
-      (acc, val) => acc + (Number(val) || 0),
-      0
-    );
-    const maxScore = answers.length * 3; // Assuming 0-3 scale
-    stressScore = Math.round((totalScore / maxScore) * 100);
-  }
+  const totalScore = answers.reduce((acc, val) => acc + (Number(val) || 0), 0);
+  const maxScore = answers.length * 3; // Assuming 0-3 scale
+  stressScore = Math.round((totalScore / maxScore) * 100);
 
   // Determine Archetype given score range
   if (stressScore > 80) archetype = "The Burnout Warrior";
@@ -45,9 +51,13 @@ const submitAssessment = asyncHandler(async (req, res) => {
 
   // Generate Personalized Plan based on Archetype
   let query = {};
-  if (archetype === "The Burnout Warrior") query = { category: "Deep Rest" };
-  else if (archetype === "The Overthinker") query = { category: "Anxiety" };
-  else if (archetype === "The Busy Bee") query = { duration: { $lt: 600 } };
+  if (archetype === "The Burnout Warrior") {
+    query = { tags: { $in: ["sleep", "rest", "healing", "stress"] } };
+  } else if (archetype === "The Overthinker") {
+    query = { tags: { $in: ["anxiety", "calm", "mindfulness"] } };
+  } else if (archetype === "The Busy Bee") {
+    query = { duration: { $lt: 600 } };
+  }
 
   const recommendedSessions = await MeditationSession.find(query).limit(5);
 
@@ -62,13 +72,19 @@ const submitAssessment = asyncHandler(async (req, res) => {
 
   finalSessions.forEach((session, index) => {
     if (index < 5) {
-      user.schedule.push({
-        title: session.title,
-        time: "08:00", // Default morning time
-        day: days[index],
-        meditationId: session._id,
-        completed: false,
-      });
+      const alreadyScheduled = user.schedule.some(
+        (item) => item.meditationId?.toString() === session._id.toString(),
+      );
+
+      if (!alreadyScheduled) {
+        user.schedule.push({
+          title: session.title,
+          time: "08:00", // Default morning time
+          day: days[index],
+          meditationId: session._id,
+          completed: false,
+        });
+      }
     }
   });
 
@@ -85,11 +101,8 @@ const submitAssessment = asyncHandler(async (req, res) => {
 // @route   POST /api/ai/chat
 // @access  Private
 const chatResponse = asyncHandler(async (req, res) => {
-  console.log("Chat Request Body:", req.body);
-  console.log("Chat Request User ID:", req.user ? req.user.id : "NO_USER");
-
   const { message } = req.body;
-  if (!message) {
+  if (typeof message !== "string" || !message.trim()) {
     res.status(400);
     throw new Error("Message required");
   }
@@ -97,12 +110,13 @@ const chatResponse = asyncHandler(async (req, res) => {
   let suggestion = null;
   let detectedSentiment = "Neutral";
 
-  if (!req.user || !req.user.id) {
+  const userId = req.user?.id || req.user?._id;
+  if (!userId) {
     res.status(401);
     throw new Error("User context missing in controller");
   }
 
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(userId);
 
   if (!user) {
     res.status(404);
@@ -144,6 +158,7 @@ const chatResponse = asyncHandler(async (req, res) => {
       "Society praises noise, but peace is found in stillness. There is nothing wrong with being selective with your energy.",
     ]);
     suggestion = {
+      title: "Healing Meditation",
       link: "/meditations/tag/healing",
     };
     detectedSentiment = "Introversion";

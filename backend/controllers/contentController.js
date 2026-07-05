@@ -3,6 +3,8 @@ const Testimonial = require("../models/Testimonial");
 const FAQ = require("../models/FAQ");
 const Feature = require("../models/Feature");
 
+const publicFields = "-__v -createdAt -updatedAt";
+
 // @desc    Get all active testimonials
 // @route   GET /api/content/testimonials
 // @access  Public
@@ -10,9 +12,9 @@ const Feature = require("../models/Feature");
 // @route   GET /api/content/testimonials
 // @access  Public
 const getTestimonials = asyncHandler(async (req, res) => {
-  const testimonials = await Testimonial.find({ isActive: true }).sort({
-    createdAt: -1,
-  });
+  const testimonials = await Testimonial.find({ isActive: true })
+    .select(publicFields)
+    .sort({ createdAt: -1 });
   res.status(200).json(testimonials);
 });
 
@@ -39,14 +41,19 @@ const createTestimonial = asyncHandler(async (req, res) => {
     isActive: true, // Auto-approve for now
   });
 
-  res.status(201).json(testimonial);
+  const { __v, createdAt, updatedAt, ...publicTestimonial } =
+    testimonial.toObject();
+
+  res.status(201).json(publicTestimonial);
 });
 
 // @desc    Get all active FAQs
 // @route   GET /api/content/faqs
 // @access  Public
 const getFAQs = asyncHandler(async (req, res) => {
-  const faqs = await FAQ.find({ isActive: true }).sort({ order: 1 });
+  const faqs = await FAQ.find({ isActive: true })
+    .select(publicFields)
+    .sort({ order: 1 });
   res.status(200).json(faqs);
 });
 
@@ -54,7 +61,9 @@ const getFAQs = asyncHandler(async (req, res) => {
 // @route   GET /api/content/features
 // @access  Public
 const getFeatures = asyncHandler(async (req, res) => {
-  const features = await Feature.find({ isActive: true }).sort({ order: 1 });
+  const features = await Feature.find({ isActive: true })
+    .select(publicFields)
+    .sort({ order: 1 });
   res.status(200).json(features);
 });
 
