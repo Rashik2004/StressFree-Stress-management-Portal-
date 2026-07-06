@@ -1,102 +1,151 @@
 # Deployment Guide
 
-## Prerequisites
+This project supports two Docker flows:
 
-- Node.js (v18+ recommended)
-- MongoDB (Local or Atlas URI)
+- Local development with hot reload: `docker-compose.yml`
+- Production-style deployment: `docker-compose.prod.yml`
 
-## 1. Backend Setup
+## Required Tools
 
-1. Navigate to the `backend` directory:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Configure Environment Variables:
-   - Create a `.env` file in the `backend` root.
-   - Add the following:
-     ```env
-     PORT=5000
-     MONGO_URI=mongodb://localhost:27017/stress-management-portal
-     JWT_SECRET=your_super_secret_key
-     NODE_ENV=development
-     ```
-4. Start the server:
-   ```bash
-   npm run dev
-   ```
+- Docker and Docker Compose v2
+- Node.js 20+ for local non-Docker checks
+- Jenkins, if you want automated deployment
 
-## 2. Frontend Setup
+## Environment Setup
 
-1. Navigate to the `frontend` directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-4. Access the application at `http://localhost:5173`.
+Create local environment files from the examples:
 
-## 3. Free Cloud Deployment Guide
+```bash
+cp .env.example .env
+cp backend/.env.example backend/.env
+```
 
-### Phase 1: Database (MongoDB Atlas)
+Update the secrets before deploying:
 
-1. **Create Account**: Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and sign up.
-2. **Create Cluster**: Create a free "Shared" cluster (M0 Sandbox).
-3. **Network Access**: whitelist `0.0.0.0/0` (Allow Access from Anywhere) in Network Access to let Render connect.
-4. **Database Access**: Create a database user via **Database Access** tab.
-5. **Get Connection String**:
-   - Go to **Database** > **Connect** > **Drivers**.
-   - Copy the string (e.g., `mongodb+srv://<user>:<password>@cluster.mongodb.net/?retryWrites=true&w=majority`).
-   - Replace `<user>` and `<password>` with your credentials.
+```env
+MONGO_USERNAME=replace_with_mongodb_username
+MONGO_PASSWORD=replace_with_strong_mongodb_password
+JWT_SECRET=replace_with_a_long_random_secret
+```
 
-### Phase 2: Backend (Render)
+Never commit real `.env` files. They are intentionally ignored by Git.
 
-1. **Sign Up**: Go to [Render](https://render.com) and login with GitHub.
-2. **New Web Service**: Click "New +" and select "Web Service".
-3. **Connect Repo**: Select your GitHub repository.
-4. **Configure Settings**:
-   - **Name**: `stress-portal-backend` (or similar)
-   - **Root Directory**: `backend` (IMPORTANT)
-   - **Build Command**: `npm install`
-   - **Start Command**: `node server.js`
-   - **Instance Type**: Free
-5. **Environment Variables**:
-   Add the following variables:
-   - `MONGO_URI`: Your MongoDB Atlas connection string.
-   - `JWT_SECRET`: A secure random string.
-   - `NODE_ENV`: `production`
-6. **Deploy**: Click "Create Web Service".
-7. **Copy URL**: Once live, copy the backend URL (e.g., `https://stress-portal-backend.onrender.com`).
+## Local Development
 
-### Phase 3: Frontend (Vercel)
+Run the full stack with live reload:
 
-1. **Sign Up**: Go to [Vercel](https://vercel.com) and login with GitHub.
-2. **Add New Project**: Import your GitHub repository.
-3. **Configure Settings**:
-   - **Root Directory**: Edit and select `frontend`.
-   - **Framework Preset**: Vite (should detect automatically).
-   - **Build Command**: `npm run build` (default).
-   - **Output Directory**: `dist` (default).
-4. **Environment Variables**:
-   Add the backend URL you copied from Render:
-   - Key: `VITE_API_URL`
-   - Value: `https://stress-portal-backend.onrender.com/api` (Remember to include `/api` if your backend routes start with it)
-5. **Deploy**: Click "Deploy".
+```bash
+docker compose up --build
+```
 
-### Phase 4: Final Verification
+Services:
 
-- Open your Vercel URL.
-- Try to Login/Register.
-- If it fails, check the "Console" in Developer Tools (F12) for errors.
-- Ensure the Backend on Render is "Live".
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:5000`
+- Backend health: `http://localhost:5000/health`
+- MongoDB: `localhost:27017`
 
-> **Note**: The Free tier on Render spins down after inactivity. The first request might take 50+ seconds. Be patient!
+Stop the stack:
+
+```bash
+docker compose down
+```
+
+## Production-Style Docker Deployment
+
+Build and start the production stack:
+
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+The production frontend is built with Vite and served by Nginx. Nginx proxies `/api` requests to the backend container, so the frontend can use:
+
+```env
+VITE_API_URL=/api
+```
+
+Default production URL:
+
+```text
+http://localhost
+```
+
+Production health URL:
+
+```text
+http://localhost/health
+```
+
+Use another host port by setting:
+
+```env
+FRONTEND_PORT=8080
+```
+
+Then redeploy:
+
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+## Health Checks
+
+Backend:
+
+```bash
+curl http://localhost:5000/health
+```
+
+Production through Nginx:
+
+```bash
+curl http://localhost/health
+```
+
+Production container status:
+
+```bash
+docker compose -f docker-compose.prod.yml ps
+```
+
+Recent logs:
+
+```bash
+docker compose -f docker-compose.prod.yml logs --tail=100
+```
+
+## Jenkins Pipeline
+
+The `Jenkinsfile` performs:
+
+1. Checkout
+2. Backend dependency install with `npm ci`
+3. Frontend dependency install
+4. Frontend lint as a non-blocking quality signal
+5. Frontend production build as a required gate
+6. Production Compose config validation
+7. Production Docker image build
+8. Deployment on `main` or `master`
+9. Backend health verification
+
+Before running the Jenkins job, create a `.env` file on the deployment machine or inject these values through Jenkins credentials:
+
+```env
+MONGO_DB_NAME=stress-management-portal
+MONGO_USERNAME=your_database_user
+MONGO_PASSWORD=your_database_password
+JWT_SECRET=your_long_random_jwt_secret
+VITE_API_URL=/api
+FRONTEND_PORT=80
+```
+
+The Jenkins agent must have permission to run Docker commands.
+
+## Production Notes
+
+- Do not expose MongoDB publicly in production.
+- Rotate any credentials that were previously committed.
+- Put the app behind HTTPS for public access.
+- Use MongoDB Atlas or a managed MongoDB instance for serious production use.
+- Add image registry push/pull later if deployment happens on a different server from Jenkins.

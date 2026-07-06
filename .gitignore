@@ -11,6 +11,12 @@ node_modules/
 .env
 .env.*
 !.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
 
 # Logs
 logs/
@@ -34,6 +40,7 @@ coverage/
 dist/
 build/
 .cache/
+.vite/
 .tmp/
 tmp/
 temp/
@@ -52,5 +59,12 @@ Thumbs.db
 
 # Docker/local override files
 docker-compose.override.yml
+docker-compose.*.override.yml
+*.local.yml
+
+# Local deployment/runtime data
+data/
+mongodb_data/
+backups/
 
 ../.DS_Store

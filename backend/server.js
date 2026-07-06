@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const mongoose = require("mongoose");
 const connectDB = require("./config/database");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
@@ -27,6 +28,19 @@ app.use("/api/ai", require("./routes/aiRoutes"));
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to Stress Management API" });
+});
+
+app.get("/health", (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const isDatabaseConnected = dbState === 1;
+
+  res.status(isDatabaseConnected ? 200 : 503).json({
+    status: isDatabaseConnected ? "ok" : "degraded",
+    service: "stress-management-api",
+    database: isDatabaseConnected ? "connected" : "disconnected",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
 });
 
 app.use(notFound);

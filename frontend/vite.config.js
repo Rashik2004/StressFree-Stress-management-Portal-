@@ -17,5 +17,20 @@ export default ({ mode }) => {
         },
       },
     },
+    // --- ADDED: Build configuration to fix the 500kb chunk warning ---
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            // This pulls all third-party libraries out of your main bundle
+            // and puts them into a separate 'vendor' file.
+            if (id.includes("node_modules")) {
+              return "vendor";
+            }
+          },
+        },
+      },
+    },
+    // -----------------------------------------------------------------
   });
 };
