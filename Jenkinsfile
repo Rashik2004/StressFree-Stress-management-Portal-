@@ -14,6 +14,14 @@ pipeline {
     }
 
     stages {
+        stage('Debug') {
+            steps {
+                sh '''
+                    pwd
+                    ls -la
+                '''
+            }
+        }
         stage('Checkout') {
             steps {
                 checkout scm
